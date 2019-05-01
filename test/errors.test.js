@@ -55,7 +55,7 @@ const mockServer = createMockServer({
 
 describe("grpc-mock errors", () => {
   before((done) => {
-    mockServer.listen("0.0.0.0:50051");
+    mockServer.listen("0.0.0.0:50059");
     done();
   });
 

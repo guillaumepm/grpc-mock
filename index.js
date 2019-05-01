@@ -101,12 +101,23 @@ class HandlerFactory {
           if (isMatched(call.request, input)) {
             if (error) {
               call.emit('error', prepareMetadata(error));
+              call.end();
             } else {
-              for (const { output } of stream) {
-                call.write(output);
+              let proms = [];
+              for (const { output, delay } of stream) {
+                  console.log('delay', delay);
+                proms.push(new Promise(resolve => {
+                    setTimeout(() => {
+                        call.write(output);
+                        resolve();
+                    }, delay);
+                }))
               }
+              Promise.all(proms).then(() => {
+                call.end();
+              });
             }
-            call.end();
+              //            call.end();
           } else {
             call.emit('error', prepareMetadata(UNEXPECTED_INPUT_PATTERN_ERROR));
             call.end();

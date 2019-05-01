@@ -25,8 +25,8 @@ const mockServer = createMockServer({
       method: "niceToMeetYou",
       streamType: "server",
       stream: [
-        { output: { message: "Hi, I'm Sana" } },
-        { output: { message: "Nice to meet you too" } },
+        { output: { message: "Hi, I'm Sana" }, delay: 1000},
+        { output: { message: "Nice to meet you too" }, delay: 1500 },
       ],
       input: { message: "Hi. I'm John. Nice to meet you" }
     },
@@ -43,7 +43,7 @@ const mockServer = createMockServer({
 
 describe("grpc-mock", () => {
   before((done) => {
-    mockServer.listen("0.0.0.0:50051");
+    mockServer.listen("0.0.0.0:50059");
     done();
   });
 
@@ -161,10 +161,13 @@ describe("grpc-mock", () => {
     it("responds nice to meet you", (done) => {
       const call = client.niceToMeetYou({ message: "Hi. I'm John. Nice to meet you" });
       const memo = [];
+      const time = new Date().getTime();
       call.on("data", (data) => {
+          console.log('still getting data');
         memo.push(data);
       });
       call.on("end", () => {
+          console.log('end', (time - new Date().getTime()));
         assert.deepEqual(memo, [
           { message: "Hi, I'm Sana" },
           { message: "Nice to meet you too" }
